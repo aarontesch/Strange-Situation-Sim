@@ -142,7 +142,7 @@ Your task: observe infant-caregiver interactions, complete behavioral assessment
 
 </div></div>
 <script>
-var T=37,cur=null,go=false,t=0,aud=true,syn=null,raf=null,t0=null,hugT=null,lastN=null,GAP=370;
+var T=37,cur=null,go=false,t=0,aud=true,syn=null,raf=null,t0=null,hugT=null,lastN=null;
 var A=[null,null,null,null,null],CL=null,ORD=['B3','A1','C1','D'];
 var SC=[['Proximity-Seeking','Does the infant approach and signal for the caregiver?'],
 ['Contact-Maintaining','Does the infant cling and resist being put down?'],
@@ -239,8 +239,10 @@ function showHug(){var h=$('hug');h.style.display='block';
 if(hugT)clearTimeout(hugT);
 hugT=setTimeout(function(){h.style.display='none'},1000)}
 
-function gap(){var m=$('mom').getBoundingClientRect(),b=$('baby').getBoundingClientRect();
-return(m.left+m.width/2)-(b.left+b.width/2)}
+// offsetLeft ignores transforms, so this is rest-to-rest distance even mid-transition
+function gapTo(id){
+var a=$(id),b=$('baby');
+return(a.offsetLeft+a.offsetWidth/2)-(b.offsetLeft+b.offsetWidth/2)}
 
 function setSceneStatus(msg, tone){
 var st=$('sceneStatus');
@@ -252,30 +254,68 @@ st.className='scene-status'+(tone? ' '+tone : '');
 function draw(x){
 var mom=$('mom'),baby=$('baby'),fig=$('fig'),hld=$('held'),
 hf=$('hface'),str=$('str'),fc=$('face');
-baby.style.transform='';GAP=gap();
+var GM=gapTo('mom'),GS=gapTo('str');
 var mX=Math.max(-400,-400+(x/3)*400),bX=Math.max(-350,-350+(x/3)*350);
 var mO=1,sO=0,wob=0,held=false,sf=false,em='😢';
-var status='Settling in and observing';
-var tone='';
+var status='Settling in and observing',tone='';
+
 if(x>=3){mX=0;bX=0;
-if(cur==='C1'&&x<19){bX=GAP*Math.min((x-3)/1.5,1);sf=true;em='😟';status='Baby clings to mother and looks worried';tone='';}
-else if(x<19){wob=Math.sin(x*.5)*30;status='Baby explores the room while checking on the caregiver';tone='';}}
-if(x>=11&&x<27){sO=.95;status='A stranger enters and the infant reacts to the new person';tone='';}
+
+  // EPISODE 2 (3-11s)
+  if(x<11){
+    status='Baby explores the room while checking on the caregiver';
+    if(cur==='C1'){bX=GM*Math.min((x-3)/1.5,1);sf=true;em='😟';status='Baby clings to mother and looks worried'}
+    else if(cur==='D'){
+      if(x<5.5){bX=GM*((x-3)/2.5)*0.5;sf=true;em='😕'}        // halfway to mother
+      else if(x<7){bX=GM*0.5*(1-(x-5.5)/1.5);sf=true;em='😕'} // drifts back
+      else{wob=Math.sin(x*.5)*30}                              // resumes toys
+    }
+    else{wob=Math.sin(x*.5)*30}
+  }
+
+  // EPISODE 3 (11-19s)
+  else if(x<19){
+    if(cur==='C1'){bX=GM;sf=true;em='😟'}
+    else if(cur==='D'){
+      if(x<14){bX=GS*((x-11)/3)*0.7;sf=true;em='😕'}           // approaches stranger
+      else if(x<16.5){bX=GS*0.7*(1-(x-14)/2.5);sf=true;em='😕'} // retreats
+      else{bX=GS*0.15*Math.sin((x-16.5)*3);sf=true;em='😕'}     // hovers, unresolved
+    }
+    else{wob=Math.sin(x*.5)*30}
+  }
+}
+
+if(x>=11&&x<27){sO=.95;status='A stranger enters and the infant reacts to the new person'}
+
+// EPISODE 4 (19-27s)
 if(x>=19&&x<27){mO=0;var sp=x-19;
-if(cur==='A1'){wob=Math.sin(x*.5)*30;status='Mother leaves: the infant shows little distress and continues playing';tone='avoidant';}
-else if(cur==='C1'){bX=GAP;sf=true;em='😢';status='Mother leaves: the infant becomes intensely distressed and upset';tone='ambivalent';if(sp%1.5<.06)showHug()}
-else{sf=true;em=sp<2?'😢':'🥺';
-if(cur==='B3'){status='Mother leaves: the infant is upset and the stranger offers comfort';tone='';}
-else{status='Mother leaves: the infant becomes confused and distressed';tone='disorganized';}
-if(sp%1.5<.06)showHug()}}
+  if(cur==='A1'){wob=Math.sin(x*.5)*30;status='Mother leaves: the infant shows little distress and continues playing';tone='avoidant'}
+  else if(cur==='C1'){bX=GM;sf=true;em='😢';status='Mother leaves: the infant becomes intensely distressed and upset';tone='ambivalent';if(sp%1.5<.06)showHug()}
+  else if(cur==='D'){
+    sf=true;em=(Math.floor(sp*1.5)%2===0)?'😕':'😢';
+    bX=Math.sin(sp*2)*25;
+    status='Mother leaves: the infant becomes confused and distressed';tone='disorganized';
+    if(sp%1.5<.06)showHug()
+  }
+  else{sf=true;em=sp<2?'😢':'🥺';status='Mother leaves: the infant is upset and the stranger offers comfort';if(sp%1.5<.06)showHug()}
+}
+
+// EPISODE 5 (27s+)
 if(x>=27){mO=1;var r=x-27;
-if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑';status='Mother returns: the infant avoids contact and ignores her';tone='avoidant';}
-else if(cur==='C1'){var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};status='Mother returns: the infant seeks comfort but still resists contact';tone='ambivalent';}
-else{var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};
-if(cur==='B3'){status='Mother returns: the infant greets her eagerly and settles quickly';tone='reunion';}
-else{status='Mother returns: the infant shows confused, inconsistent behavior';tone='disorganized';}}}
+  if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑';status='Mother returns: the infant avoids contact and ignores her';tone='avoidant'}
+  else if(cur==='D'){
+    sf=true;em='😕';
+    bX=GM*(0.5+0.35*Math.sin(r*2.2));   // approaches, backs off, never settles
+    status='Mother returns: the infant shows confused, inconsistent behavior';tone='disorganized'
+  }
+  else{var p=Math.min(r/1.5,1);
+    if(p<1){bX=GM*p}else{held=true;bX=GM}
+    if(cur==='C1'){status='Mother returns: the infant seeks comfort but still resists contact';tone='ambivalent'}
+    else{status='Mother returns: the infant greets her eagerly and settles quickly';tone='reunion'}}
+}
+
 fc.style.display=sf?'block':'none';if(sf)fc.textContent=em;
-if(sf&&em!=='😑'&&em!=='😟')baby.classList.add('shaking');
+if(sf&&(em==='😢'||em==='🥺'))baby.classList.add('shaking');
 else baby.classList.remove('shaking');
 fig.style.display=held?'none':'inline';
 hld.style.display=held?'block':'none';

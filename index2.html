@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strange Situation Paradigm Simulator</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;padding:20px}
+.wrap{max-width:1200px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.3);overflow:hidden}
+.hd{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:30px;text-align:center}
+.hd h1{font-size:2.2em;margin-bottom:10px}
+.bd{padding:40px}
+.view{display:none}.view.active{display:block;animation:fi .3s}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:30px 0}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:30px 0}
+.mb{padding:25px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;font-size:1.1em;font-weight:bold;cursor:pointer;transition:.2s}
+.mb:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(102,126,234,.4)}
+.cb{padding:20px;background:#f0f4ff;border:3px solid #667eea;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;color:#333;transition:.3s}
+.cb:hover{background:#667eea;color:#fff;transform:translateY(-3px)}
+.room{background:linear-gradient(135deg,#667eea,#764ba2);border:3px solid #667eea;border-radius:12px;position:relative;height:400px;overflow:hidden;margin:20px 0;padding:20px;display:flex;justify-content:space-around;align-items:flex-end}
+.toy{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:4em;z-index:0}
+.ch{text-align:center;font-size:3em;position:relative;z-index:1;transition:opacity .3s}
+.face,.hug,.hface{position:absolute;left:50%;animation:bob .5s ease-in-out infinite}
+.face{top:-32px;font-size:1.5em}
+.hug{top:-42px;font-size:1.3em;animation:fd 1s ease-in-out}
+.held{position:absolute;left:6px;top:-14px;font-size:1.2em}
+.hface{top:-26px;font-size:.85em}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-14px)}}
+@keyframes fd{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+@keyframes sh{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes lf{0%{transform:translateY(0);opacity:0}100%{transform:translateY(-14px);opacity:1}}
+.shaking{animation:sh .3s ease-in-out infinite}
+.lifting{animation:lf 1.2s ease-out forwards}
+.ep{background:#f0f4ff;padding:20px;border-radius:8px;margin:20px 0;border-left:5px solid #667eea}
+.ep h3{color:#667eea;margin-bottom:10px}.ep p{color:#333;line-height:1.6}
+.ctl{display:flex;gap:15px;justify-content:center;margin:30px 0;flex-wrap:wrap}
+button{padding:12px 25px;font-size:1em;border:none;border-radius:6px;cursor:pointer;font-weight:bold;transition:.2s}
+.p{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}.p:hover{transform:translateY(-2px)}
+.s{background:#e0e0e0;color:#333}.s:hover{background:#d0d0d0}
+.sc{background:#f9f9f9;padding:20px;border-radius:8px;border:2px solid #e0e0e0;margin-bottom:20px}
+.sc h4{color:#667eea;margin-bottom:8px}.sc p{color:#666;font-size:.95em;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.sb{padding:10px;background:#fff;border:2px solid #ddd;border-radius:6px;cursor:pointer;font-weight:bold;flex:1;min-width:45px}
+.sb:hover{background:#f0f4ff;border-color:#667eea}.sb.on{background:#667eea;color:#fff;border-color:#667eea}
+.co{padding:20px;background:#f0f4ff;border:3px solid #ddd;border-radius:8px;cursor:pointer;text-align:center;font-weight:bold;transition:.3s}
+.co:hover{border-color:#667eea}.co.on{background:#667eea;color:#fff;border-color:#667eea}
+.fb{margin:30px 0;padding:20px;border-radius:8px;font-weight:bold;font-size:1.1em}
+.fb.ok{background:#d4edda;border:2px solid #28a745;color:#155724}
+.fb.no{background:#f8d7da;border:2px solid #dc3545;color:#721c24}
+.aud{background:#e8f0ff;padding:15px;border-radius:8px;margin:20px 0;text-align:center}
+.aud button{background:#667eea;color:#fff}
+.sum{background:#f0f4ff;padding:20px;border-radius:8px;margin:20px 0}
+.ri{display:grid;grid-template-columns:220px 1fr;gap:15px;margin:10px 0;padding:10px;background:#fff;border-radius:6px}
+.ri b{color:#667eea}
+.tm{background:#e8f0ff;padding:15px;border-radius:6px;margin:20px 0;border-left:4px solid #667eea;text-align:center;color:#667eea;font-weight:bold}
+.intro{font-size:1.1em;line-height:1.8;color:#555;margin-bottom:30px}
+.dbf{font-size:1.1em;line-height:1.8;color:#555;margin-bottom:20px}
+@media(max-width:768px){.g2,.g4{grid-template-columns:1fr}.room{height:260px}.ch{font-size:2em}.ri{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+<div class="hd"><h1>🔬 Strange Situation Paradigm Simulator</h1>
+<p>Learn to assess attachment styles through interactive observation</p></div>
+<div class="bd">
+
+<div id="menu" class="view active">
+<div style="text-align:center;margin:40px 0"><h2 style="color:#667eea;margin-bottom:30px;font-size:1.8em">Welcome</h2>
+<p class="intro">This simulator presents four recorded observations of the Strange Situation Paradigm.<br>
+Your task: observe infant-caregiver interactions, complete behavioral assessments, and classify attachment styles.</p></div>
+<div class="g2">
+<button class="mb" data-go="pick">👨‍🎓 Student Mode<br><small style="opacity:.8">Observe and assess cases</small></button>
+<button class="mb" data-go="debrief">👨‍🏫 Instructor Debrief<br><small style="opacity:.8">Review correct answers</small></button></div></div>
+
+<div id="pick" class="view">
+<h2 style="color:#667eea;text-align:center;margin-bottom:20px">Select a Case</h2>
+<p style="text-align:center;color:#666;margin-bottom:30px">You will observe a 37-second simulation with audio narration, then assess the infant's behavior.</p>
+<div class="g2" id="cases"></div>
+<div class="ctl"><button class="s" data-go="menu">← Back to Menu</button></div></div>
+
+<div id="sim" class="view">
+<h2 id="ttl" style="color:#667eea;text-align:center;margin-bottom:20px"></h2>
+<div class="ep"><h3 id="epT">Preparing...</h3><p id="epD"></p></div>
+<div class="room">
+<div class="toy">🚂</div>
+<div class="ch" id="mom">👩<div class="held" id="held" style="display:none">👶<div class="hface" id="hface"
+    <div class="hface" id="hface" style="display:none">😠</div></div></div>
+<div class="ch" id="baby"><span id="fig">👶</span><div class="face" id="face" style="display:none">😢</div></div>
+<div class="ch" id="str" style="opacity:0">👨<div class="hug" id="hug" style="display:none">🤗</div></div>
+</div>
+<div class="aud"><button id="audBtn">🔊 Narration: ON</button></div>
+<div class="ctl"><button class="p" id="playBtn">▶ Play</button><button class="s" id="resetBtn">Reset</button></div>
+<div class="tm">⏱ Time: <span id="tm">0:00 / 0:37</span></div>
+<div class="ctl"><button class="p" id="assessBtn" style="display:none">Assess Now →</button><button class="s" data-go="pick">← Back</button></div></div>
+
+<div id="assess" class="view">
+<div style="text-align:center;margin-bottom:30px"><h2 style="color:#667eea">Assess the Infant's Behavior</h2>
+<p style="color:#666;margin-top:10px">Using Ainsworth's Attachment Scales (1-7)</p></div>
+<div id="scales"></div>
+<h3 style="color:#667eea;margin:30px 0 15px">Attachment Classification</h3>
+<div class="g4" id="classes"></div>
+<div class="ctl"><button class="p" id="subBtn">Submit Assessment</button><button class="s" id="clrBtn">Clear Answers</button></div></div>
+
+<div id="results" class="view">
+<div style="text-align:center;margin-bottom:30px"><h2 id="rTtl" style="color:#667eea"></h2></div>
+<div id="fbBox"></div>
+<div class="sum"><h3>Your Assessment</h3>
+<div class="ri"><b>Proximity-Seeking:</b><span id="r0"></span></div>
+<div class="ri"><b>Contact-Maintaining:</b><span id="r1"></span></div>
+<div class="ri"><b>Avoidance:</b><span id="r2"></span></div>
+<div class="ri"><b>Resistance:</b><span id="r3"></span></div>
+<div class="ri"><b>Disorganization:</b><span id="r4"></span></div>
+<div class="ri"><b>Your Classification:</b><span id="rY"></span></div>
+<div class="ri"><b>Correct Classification:</b><span id="rC"></span></div></div>
+<div class="ctl"><button class="s" data-go="pick">← Choose Another</button><button class="p" data-go="menu">Back to Menu</button></div></div>
+
+<div id="debrief" class="view">
+<h2 style="color:#667eea;text-align:center;margin-bottom:30px">Instructor Debrief</h2>
+<p class="dbf"><b>Case 1 (Secure B3):</b> High proximity-seeking (6-7), high contact-maintaining (6), minimal avoidance (1), minimal resistance (1), organized behavior (1). Infant balances exploration with secure-base use and recovers readily from mild distress via caregiver contact [1].</p>
+<p class="dbf"><b>Case 2 (Avoidant A1):</b> Low proximity-seeking (2-3), low contact-maintaining (1-2), high avoidance (6-7), minimal resistance (1), organized behavior (1-2). Infant ignores mother despite her reunion attempts—this active disregard is the diagnostic marker [1].</p>
+<p class="dbf"><b>Case 3 (Ambivalent C1):</b> High proximity-seeking (5-6), high contact-maintaining (6-7), minimal avoidance (1), high resistance (5-7), organized behavior (1-2). Infant shows the "push-pull" dynamic: seeks contact urgently but is angry and resistant when held [1].</p>
+<p class="dbf"><b>Case 4 (Disorganized D):</b> Variable scores across proximity, contact, and avoidance; high disorganization (6-7). Infant shows contradictory, apprehensive, or confused behaviors—particularly at reunion—with no coherent strategy [1].</p>
+<div class="ctl" style="margin-top:40px"><button class="s" data-go="menu">← Back to Menu</button></div></div>
+
+</div></div>
+<script>
+var T=37,cur=null,go=false,t=0,aud=true,syn=null,raf=null,t0=null,hugT=null,lastN=null,GAP=370;
+var A=[null,null,null,null,null],CL=null;
+var SC=[['Proximity-Seeking','Does the infant approach and signal for the caregiver?'],
+['Contact-Maintaining','Does the infant cling and resist being put down?'],
+['Avoidance','Does the infant ignore or avoid the caregiver?'],
+['Resistance','Does the infant show anger or opposition?'],
+['Disorganization','Does the infant show contradictory or confused behaviors?']];
+var CC=[['B','🟢','Secure (B)'],['A','🔵','Avoidant (A)'],['C','🟡','Ambivalent (C)'],['D','🔴','Disorganized (D)']];
+var EP=[[0,3,'Episode 1: Introduction'],[3,8,'Episode 2: Free Exploration'],[11,8,'Episode 3: Stranger Enters'],[19,8,'Episode 4: Separation 1'],[27,10,'Episode 5: Reunion 1']];
+var CD={
+B3:{n:'Secure Attachment (B3)',k:'B',d:['Mother and baby enter the room together.','Mother sits quietly. Baby explores the toys freely.','Stranger enters and converses with mother.','Mother leaves. Baby is distressed; stranger attempts comfort.','Mother returns and picks up the baby.'],
+v:['The experimenter introduces the mother and baby to the laboratory room.','Mother sits down. The infant explores the toys confidently, frequently checking back on the mother.','A stranger enters the room and begins a conversation with the mother.','The mother leaves. The baby shows distress, and the stranger attempts to comfort them.','The mother returns. The baby moves toward her eagerly, is picked up, and settles quickly.']},
+A1:{n:'Avoidant Attachment (A1)',k:'A',
+d:['Mother and baby enter the room together.','Mother sits. Baby explores independently.','Stranger enters and converses with mother.','Mother leaves. Baby shows little distress.','Mother returns. Baby ignores her.'],
+v:['The experimenter introduces the mother and baby to the laboratory room.','Mother sits down. The infant goes straight to the toys, rarely looking back at the mother.','A stranger enters. The infant keeps playing, treating the stranger neutrally.','The mother leaves. The baby shows minimal distress and continues playing.','The mother returns. The infant turns away and ignores her despite her attempts to engage.']},
+C1:{n:'Ambivalent Attachment (C1)',k:'C',
+d:['Mother and baby enter the room together.','Baby rushes back and clings to mother.','Stranger enters. Baby stays clinging to mother.','Mother leaves. Baby is inconsolable.','Mother returns. Baby is held but stays angry.'],
+v:['The experimenter introduces the mother and baby to the laboratory room.','Mother sits down. The infant grows anxious and rushes back to cling to her, showing worry.','A stranger enters. The infant keeps clinging to the mother, visibly distressed.','The mother leaves. The infant shows intense angry distress and the stranger cannot console them.','The mother returns. The infant rushes to her and is picked up, but stays angry and resistant while held.']},
+D:{n:'Disorganized Attachment (D)',k:'D',
+d:['Mother and baby enter the room together.','Mother sits. Baby behaviour is erratic.','Stranger enters. Baby approaches then retreats.','Mother leaves. Baby is confused and distressed.','Mother returns. Baby shows no coherent strategy.'],
+v:['The experimenter introduces the mother and baby to the laboratory room.','Mother sits down. Exploration is disorganized, with freezing and unusual movements.','A stranger enters. The infant shows apprehension and contradictory approach-retreat behaviour.','The mother leaves. The infant is distressed and disoriented.','The mother returns. The infant approaches while backing away, or freezes. No coherent strategy emerges.']}};
+
+function $(i){return document.getElementById(i)}
+
+function show(id){var v=document.querySelectorAll('.view');
+for(var i=0;i<v.length;i++)v[i].classList.remove('active');
+$(id).classList.add('active');window.scrollTo(0,0)}
+
+function build(){
+var c=$('cases');
+for(var i=0;i<4;i++){var k=['B3','A1','C1','D'][i];
+var b=document.createElement('button');b.className='cb';
+b.textContent='Case '+(i+1)+': Unknown';b.dataset.k=k;
+b.addEventListener('click',function(e){startCase(e.currentTarget.dataset.k)});
+c.appendChild(b)}
+var s=$('scales');
+for(var j=0;j<SC.length;j++){var d=document.createElement('div');d.className='sc';
+d.innerHTML='<h4>'+(j+1)+'. '+SC[j][0]+' (1-7)</h4><p>'+SC[j][1]+'</p>';
+var r=document.createElement('div');r.className='row';
+for(var n=1;n<=7;n++){var q=document.createElement('button');q.className='sb';
+q.textContent=n;q.dataset.i=j;q.dataset.v=n;
+q.addEventListener('click',pickS);r.appendChild(q)}
+d.appendChild(r);s.appendChild(d)}
+var cw=$('classes');
+for(var m=0;m<CC.length;m++){var o=document.createElement('div');o.className='co';
+o.dataset.c=CC[m][0];
+o.innerHTML='<div style="font-size:1.4em;margin-bottom:8px">'+CC[m][1]+'</div><strong>'+CC[m][2]+'</strong>';
+o.addEventListener('click',pickC);cw.appendChild(o)}}
+
+function pickS(e){var b=e.currentTarget;A[+b.dataset.i]=+b.dataset.v;
+var sib=b.parentElement.children;
+for(var i=0;i<sib.length;i++)sib[i].classList.remove('on');
+b.classList.add('on')}
+
+function pickC(e){var o=e.currentTarget;CL=o.dataset.c;
+var all=document.querySelectorAll('.co');
+for(var i=0;i<all.length;i++)all[i].classList.remove('on');
+o.classList.add('on')}
+
+function clearA(){A=[null,null,null,null,null];CL=null;
+var all=document.querySelectorAll('.sb,.co');
+for(var i=0;i<all.length;i++)all[i].classList.remove('on')}
+
+function epIdx(x){for(var i=0;i<EP.length;i++)
+if(x>=EP[i][0]&&x<EP[i][0]+EP[i][1])return i;return EP.length-1}
+
+function startCase(k){cur=k;go=false;t=0;t0=null;lastN=null;aud=true;
+clearA();$('ttl').textContent=CD[k].n;$('playBtn').textContent='▶ Play';
+$('assessBtn').style.display='none';$('audBtn').textContent='🔊 Narration: ON';
+$('tm').textContent='0:00 / 0:'+T;updateEp();draw(0);show('sim')}
+
+function updateEp(){if(!cur)return;var i=epIdx(t);
+$('epT').textContent=EP[i][2];$('epD').textContent=CD[cur].d[i]}
+
+function say(x){if(!aud||!syn)return;
+var u=new SpeechSynthesisUtterance(x);u.rate=.9;u.volume=.7;syn.speak(u)}
+
+function togglePlay(){if(!cur)return;
+if(!go){go=true;t0=Date.now()-t*1000;$('playBtn').textContent='⏸ Pause';loop()}
+else{go=false;$('playBtn').textContent='▶ Play';
+if(syn)syn.cancel();if(raf)cancelAnimationFrame(raf)}}
+
+function loop(){if(!go||!cur)return;
+t=Math.min((Date.now()-t0)/1000,T);
+var s=Math.floor(t%60);
+$('tm').textContent='0:'+(s<10?'0':'')+s+' / 0:'+T;
+var i=epIdx(t);if(lastN!==i){say(CD[cur].v[i]);lastN=i}
+updateEp();draw(t);
+if(t>=T){go=false;$('playBtn').textContent='▶ Play';
+$('assessBtn').style.display='inline-block';return}
+raf=requestAnimationFrame(loop)}
+
+function showHug(){var h=$('hug');h.style.display='block';
+if(hugT)clearTimeout(hugT);
+hugT=setTimeout(function(){h.style.display='none'},1000)}
+
+function gap(){var m=$('mom').getBoundingClientRect(),b=$('baby').getBoundingClientRect();
+return(m.left+m.width/2)-(b.left+b.width/2)}
+
+function draw(x){
+var mom=$('mom'),baby=$('baby'),fig=$('fig'),hld=$('held'),
+hf=$('hface'),str=$('str'),fc=$('face');
+baby.style.transform='';GAP=gap();
+var mX=Math.max(-400,-400+(x/3)*400),bX=Math.max(-350,-350+(x/3)*350);
+var mO=1,sO=0,wob=0,held=false,sf=false,em='😢';
+if(x>=3){mX=0;bX=0;
+if(cur==='C1'&&x<19){bX=GAP*Math.min((x-3)/1.5,1);sf=true;em='😟'}
+else if(x<19){wob=Math.sin(x*.5)*30}}
+if(x>=11&&x<27)sO=.8;
+if(x>=19&&x<27){mO=0;var sp=x-19;
+if(cur==='A1'){wob=Math.sin(x*.5)*30}
+else if(cur==='C1'){bX=GAP;sf=true;em='😢';if(sp%1.5<.06)showHug()}
+else{sf=true;em=sp<2?'😢':'🥺';if(sp%1.5<.06)showHug()}}
+if(x>=27){mO=1;var r=x-27;
+if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑'}
+else{var p=Math.min(r/1.5,1);
+if(p<1){bX=GAP*p}else{held=true;bX=GAP}}}
+fc.style.display=sf?'block':'none';if(sf)fc.textContent=em;
+if(sf&&em!=='😑'&&em!=='😟')baby.classList.add('shaking');
+else baby.classList.remove('shaking');
+fig.style.display=held?'none':'inline';
+hld.style.display=held?'block':'none';
+hf.style.display=(held&&cur==='C1')?'block':'none';
+if(held)hld.classList.add('lifting');else hld.classList.remove('lifting');
+mom.style.opacity=mO;mom.style.transform='translateX('+mX+'px)';
+baby.style.transform='translateX('+(bX+wob)+'px)';
+str.style.opacity=sO}
+
+function reset(){go=false;t=0;t0=null;lastN=null;
+if(syn)syn.cancel();if(raf)cancelAnimationFrame(raf);
+if(hugT)clearTimeout(hugT);
+$('playBtn').textContent='▶ Play';$('assessBtn').style.display='none';
+$('hug').style.display='none';$('tm').textContent='0:00 / 0:'+T;
+updateEp();draw(0)}
+
+function submit(){
+for(var i=0;i<5;i++){if(!A[i]){alert('Please rate all scales and select a classification.');return}}
+if(!CL){alert('Please rate all scales and select a classification.');return}
+var c=CD[cur],ok=(CL===c.k);
+$('rTtl').textContent=c.n;
+$('fbBox').innerHTML='<div class="fb '+(ok?'ok':'no')+'"><strong>'+
+(ok?'\u2713 Correct!':'\u2717 Incorrect')+'</strong><p style="margin-top:10px">'+
+(ok?'Excellent! Your classification matches.':
+'The correct classification is <strong>'+c.k+'</strong>.')+'</p></div>';
+for(var j=0;j<5;j++)$('r'+j).textContent=A[j]+' / 7';
+$('rY').textContent=CL;
+$('rC').textContent=c.k;
+show('results')}
+
+function toggleAudio(){aud=!aud;
+$('audBtn').textContent=aud?'🔊 Narration: ON':'🔇 Narration: OFF';
+if(!aud&&syn)syn.cancel()}
+
+function init(){
+try{syn=window.speechSynthesis||null}catch(e){syn=null}
+build();
+var nav=document.querySelectorAll('[data-go]');
+for(var i=0;i<nav.length;i++){
+nav[i].addEventListener('click',function(e){
+if(syn)syn.cancel();
+show(e.currentTarget.dataset.go)})}
+$('playBtn').addEventListener('click',togglePlay);
+$('resetBtn').addEventListener('click',reset);
+$('audBtn').addEventListener('click',toggleAudio);
+$('assessBtn').addEventListener('click',function(){
+go=false;if(syn)syn.cancel();
+if(raf)cancelAnimationFrame(raf);
+show('assess')});
+$('subBtn').addEventListener('click',submit);
+$('clrBtn').addEventListener('click',clearA);
+window.addEventListener('resize',function(){if(!go&&cur)draw(t)});
+show('menu')}
+
+if(document.readyState==='loading')
+document.addEventListener('DOMContentLoaded',init);
+else init();
+</script>
+</body>
+</html>

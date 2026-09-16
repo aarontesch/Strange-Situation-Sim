@@ -24,7 +24,7 @@ body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;background:linear-gradient
 .avatar{position:relative;display:flex;align-items:center;justify-content:center;line-height:1;filter:drop-shadow(0 12px 16px rgba(0,0,0,.15));}
 .tag{margin-top:8px;background:rgba(255,255,255,.85);color:#3f4d8f;border:2px solid rgba(102,126,234,.35);padding:4px 12px;border-radius:999px;font-size:.26em;font-weight:800;letter-spacing:.03em;box-shadow:0 6px 18px rgba(0,0,0,.08)}
 .face,.hug,.hface{position:absolute;left:50%;transform:translateX(-50%);animation:bob .5s ease-in-out infinite}
-.face{top:-34px;font-size:1.5em}
+.face{top:-.8em;font-size:.7em}
 .hug{top:-52px;font-size:1.35em;animation:fd 1s ease-in-out}
 .held{position:absolute;left:20px;top:-18px;font-size:1.2em;display:flex;align-items:flex-end;gap:2px}
 .hface{top:-10px;font-size:.85em}
@@ -91,19 +91,16 @@ Your task: observe infant-caregiver interactions, complete behavioral assessment
 <div class="room">
 <div class="toy">🚂</div>
 <div class="ch" id="mom">
-  <div class="avatar">👩</div>
+  <div class="avatar">👩<div class="held" id="held" style="display:none"><span>👶</span><div class="hface" id="hface" style="display:none">😠</div></div></div>
   <div class="tag">Mother</div>
-  <div class="held" id="held" style="display:none"><span>👶</span><div class="hface" id="hface" style="display:none">😠</div></div>
 </div>
 <div class="ch" id="baby">
-  <div class="avatar" id="fig">👶</div>
+  <div class="avatar" id="fig">👶<div class="face" id="face" style="display:none">😢</div></div>
   <div class="tag">Baby</div>
-  <div class="face" id="face" style="display:none">😢</div>
 </div>
 <div class="ch" id="str" style="opacity:0">
-  <div class="avatar">👨</div>
+  <div class="avatar">👨<div class="hug" id="hug" style="display:none">🤗</div></div>
   <div class="tag">Stranger</div>
-  <div class="hug" id="hug" style="display:none">🤗</div>
 </div>
 </div>
 <div class="aud"><button id="audBtn">🔊 Narration: ON</button></div>
@@ -315,9 +312,9 @@ if(x>=27){mO=1;var r=x-27;
 }
 
 fc.style.display=sf?'block':'none';if(sf)fc.textContent=em;
-if(sf&&(em==='😢'||em==='🥺'))baby.classList.add('shaking');
-else baby.classList.remove('shaking');
-fig.style.display=held?'none':'inline';
+if(sf&&(em==='😢'||em==='🥺'))fig.classList.add('shaking');
+else fig.classList.remove('shaking');
+fig.style.display=held?'none':'';
 hld.style.display=held?'block':'none';
 hf.style.display=(held&&cur==='C1')?'block':'none';
 if(held)hld.classList.add('lifting');else hld.classList.remove('lifting');

@@ -143,7 +143,7 @@ Your task: observe infant-caregiver interactions, complete behavioral assessment
 </div></div>
 <script>
 var T=37,cur=null,go=false,t=0,aud=true,syn=null,raf=null,t0=null,hugT=null,lastN=null,GAP=370;
-var A=[null,null,null,null,null],CL=null;
+var A=[null,null,null,null,null],CL=null,ORD=['B3','A1','C1','D'];
 var SC=[['Proximity-Seeking','Does the infant approach and signal for the caregiver?'],
 ['Contact-Maintaining','Does the infant cling and resist being put down?'],
 ['Avoidance','Does the infant ignore or avoid the caregiver?'],
@@ -172,7 +172,7 @@ $(id).classList.add('active');window.scrollTo(0,0)}
 
 function build(){
 var c=$('cases');
-for(var i=0;i<4;i++){var k=['B3','A1','C1','D'][i];
+for(var i=0;i<ORD.length;i++){var k=ORD[i];
 var b=document.createElement('button');b.className='cb';
 b.textContent='Case '+(i+1)+': Unknown';b.dataset.k=k;
 b.addEventListener('click',function(e){startCase(e.currentTarget.dataset.k)});
@@ -209,7 +209,7 @@ function epIdx(x){for(var i=0;i<EP.length;i++)
 if(x>=EP[i][0]&&x<EP[i][0]+EP[i][1])return i;return EP.length-1}
 
 function startCase(k){cur=k;go=false;t=0;t0=null;lastN=null;aud=true;
-clearA();$('ttl').textContent=CD[k].n;$('playBtn').textContent='▶ Play';
+clearA();$('ttl').textContent='Case '+(ORD.indexOf(k)+1);$('playBtn').textContent='▶ Play';
 $('assessBtn').style.display='none';$('audBtn').textContent='🔊 Narration: ON';
 $('tm').textContent='0:00 / 0:'+T;updateEp();draw(0);show('sim')}
 
@@ -219,10 +219,11 @@ $('epT').textContent=EP[i][2];$('epD').textContent=CD[cur].d[i]}
 function say(x){if(!aud||!syn)return;
 var u=new SpeechSynthesisUtterance(x);u.rate=.9;u.volume=.7;syn.speak(u)}
 
+function halt(){go=false;if(syn)syn.cancel();if(raf)cancelAnimationFrame(raf)}
+
 function togglePlay(){if(!cur)return;
 if(!go){go=true;t0=Date.now()-t*1000;$('playBtn').textContent='⏸ Pause';loop()}
-else{go=false;$('playBtn').textContent='▶ Play';
-if(syn)syn.cancel();if(raf)cancelAnimationFrame(raf)}}
+else{halt();$('playBtn').textContent='▶ Play'}}
 
 function loop(){if(!go||!cur)return;
 t=Math.min((Date.now()-t0)/1000,T);
@@ -263,11 +264,16 @@ if(x>=11&&x<27){sO=.95;status='A stranger enters and the infant reacts to the ne
 if(x>=19&&x<27){mO=0;var sp=x-19;
 if(cur==='A1'){wob=Math.sin(x*.5)*30;status='Mother leaves: the infant shows little distress and continues playing';tone='avoidant';}
 else if(cur==='C1'){bX=GAP;sf=true;em='😢';status='Mother leaves: the infant becomes intensely distressed and upset';tone='ambivalent';if(sp%1.5<.06)showHug()}
-else{sf=true;em=sp<2?'😢':'🥺';status='Mother leaves: the infant becomes confused and distressed';tone='disorganized';if(sp%1.5<.06)showHug()}}
+else{sf=true;em=sp<2?'😢':'🥺';
+if(cur==='B3'){status='Mother leaves: the infant is upset and the stranger offers comfort';tone='';}
+else{status='Mother leaves: the infant becomes confused and distressed';tone='disorganized';}
+if(sp%1.5<.06)showHug()}}
 if(x>=27){mO=1;var r=x-27;
 if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑';status='Mother returns: the infant avoids contact and ignores her';tone='avoidant';}
 else if(cur==='C1'){var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};status='Mother returns: the infant seeks comfort but still resists contact';tone='ambivalent';}
-else{var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};status='Mother returns: the infant shows confused, inconsistent behavior';tone='disorganized';}}
+else{var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};
+if(cur==='B3'){status='Mother returns: the infant greets her eagerly and settles quickly';tone='reunion';}
+else{status='Mother returns: the infant shows confused, inconsistent behavior';tone='disorganized';}}}
 fc.style.display=sf?'block':'none';if(sf)fc.textContent=em;
 if(sf&&em!=='😑'&&em!=='😟')baby.classList.add('shaking');
 else baby.classList.remove('shaking');
@@ -316,15 +322,13 @@ build();
 var nav=document.querySelectorAll('[data-go]');
 for(var i=0;i<nav.length;i++){
 nav[i].addEventListener('click',function(e){
-if(syn)syn.cancel();
+halt();
 show(e.currentTarget.dataset.go)})}
 $('playBtn').addEventListener('click',togglePlay);
 $('resetBtn').addEventListener('click',reset);
 $('audBtn').addEventListener('click',toggleAudio);
 $('assessBtn').addEventListener('click',function(){
-go=false;if(syn)syn.cancel();
-if(raf)cancelAnimationFrame(raf);
-show('assess')});
+halt();show('assess')});
 $('subBtn').addEventListener('click',submit);
 $('clrBtn').addEventListener('click',clearA);
 window.addEventListener('resize',function(){if(!go&&cur)draw(t)});

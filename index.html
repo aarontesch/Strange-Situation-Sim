@@ -16,19 +16,28 @@ body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;background:linear-gradient
 .mb:hover{transform:translateY(-5px);box-shadow:0 8px 20px rgba(102,126,234,.4)}
 .cb{padding:20px;background:#f0f4ff;border:3px solid #667eea;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;color:#333;transition:.3s}
 .cb:hover{background:#667eea;color:#fff;transform:translateY(-3px)}
-.room{background:linear-gradient(135deg,#667eea,#764ba2);border:3px solid #667eea;border-radius:12px;position:relative;height:400px;overflow:hidden;margin:20px 0;padding:20px;display:flex;justify-content:space-around;align-items:flex-end}
-.toy{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:4em;z-index:0}
-.ch{text-align:center;font-size:3em;position:relative;z-index:1;transition:opacity .3s}
-.face,.hug,.hface{position:absolute;left:50%;animation:bob .5s ease-in-out infinite}
-.face{top:-32px;font-size:1.5em}
-.hug{top:-42px;font-size:1.3em;animation:fd 1s ease-in-out}
-.held{position:absolute;left:6px;top:-14px;font-size:1.2em}
-.hface{top:-26px;font-size:.85em}
+.room{background:linear-gradient(180deg,#cfe5ff 0%,#e9f3ff 18%,#d9efdc 18%,#f3f0e7 100%);border:4px solid rgba(102,126,234,.7);border-radius:18px;position:relative;height:430px;overflow:hidden;margin:20px 0;padding:20px;display:flex;justify-content:space-around;align-items:flex-end;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25),0 18px 40px rgba(102,126,234,.18)}
+.room::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 30%);pointer-events:none}
+.room::after{content:"";position:absolute;left:0;right:0;bottom:0;height:90px;background:linear-gradient(180deg,rgba(154,118,79,.05),rgba(128,94,64,.28));border-top:4px solid rgba(107,79,52,.4)}
+.toy{position:absolute;bottom:35px;left:50%;transform:translateX(-50%);font-size:4.1em;z-index:0;filter:drop-shadow(0 8px 10px rgba(0,0,0,.2));}
+.ch{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;text-align:center;font-size:3.1em;position:relative;z-index:2;transition:opacity .3s,filter .3s,transform .3s}
+.avatar{position:relative;display:flex;align-items:center;justify-content:center;line-height:1;filter:drop-shadow(0 12px 16px rgba(0,0,0,.15));}
+.tag{margin-top:8px;background:rgba(255,255,255,.85);color:#3f4d8f;border:2px solid rgba(102,126,234,.35);padding:4px 12px;border-radius:999px;font-size:.26em;font-weight:800;letter-spacing:.03em;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.face,.hug,.hface{position:absolute;left:50%;transform:translateX(-50%);animation:bob .5s ease-in-out infinite}
+.face{top:-34px;font-size:1.5em}
+.hug{top:-52px;font-size:1.35em;animation:fd 1s ease-in-out}
+.held{position:absolute;left:20px;top:-18px;font-size:1.2em;display:flex;align-items:flex-end;gap:2px}
+.hface{top:-10px;font-size:.85em}
+.scene-status{margin:0 auto 18px;background:linear-gradient(135deg,#eef4ff,#f8f6ff);border:2px solid rgba(102,126,234,.35);color:#3f4d8f;padding:10px 18px;border-radius:999px;font-weight:700;text-align:center;box-shadow:0 8px 18px rgba(102,126,234,.12)}
+.scene-status.avoidant{background:linear-gradient(135deg,#eaf5ff,#edf8ff);color:#245d85}
+.scene-status.ambivalent{background:linear-gradient(135deg,#fff9ea,#fff2d8);color:#8d5e00}
+.scene-status.disorganized{background:linear-gradient(135deg,#fff0f0,#ffe3e3);color:#8e2d2d}
+.scene-status.reunion{background:linear-gradient(135deg,#eafaf0,#dff7e8);color:#1d6a40}
 @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-14px)}}
-@keyframes fd{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+@keyframes fd{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}50%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-10px) scale(.9)}}
 @keyframes sh{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 @keyframes lf{0%{transform:translateY(0);opacity:0}100%{transform:translateY(-14px);opacity:1}}
-.shaking{animation:sh .3s ease-in-out infinite}
+.shaking{animation:sh .25s ease-in-out infinite}
 .lifting{animation:lf 1.2s ease-out forwards}
 .ep{background:#f0f4ff;padding:20px;border-radius:8px;margin:20px 0;border-left:5px solid #667eea}
 .ep h3{color:#667eea;margin-bottom:10px}.ep p{color:#333;line-height:1.6}
@@ -78,12 +87,24 @@ Your task: observe infant-caregiver interactions, complete behavioral assessment
 <div id="sim" class="view">
 <h2 id="ttl" style="color:#667eea;text-align:center;margin-bottom:20px"></h2>
 <div class="ep"><h3 id="epT">Preparing...</h3><p id="epD"></p></div>
+<div class="scene-status" id="sceneStatus">Settling in and observing</div>
 <div class="room">
 <div class="toy">🚂</div>
-<div class="ch" id="mom">👩<div class="held" id="held" style="display:none">👶<div class="hface" id="hface"
-    <div class="hface" id="hface" style="display:none">😠</div></div></div>
-<div class="ch" id="baby"><span id="fig">👶</span><div class="face" id="face" style="display:none">😢</div></div>
-<div class="ch" id="str" style="opacity:0">👨<div class="hug" id="hug" style="display:none">🤗</div></div>
+<div class="ch" id="mom">
+  <div class="avatar">👩</div>
+  <div class="tag">Mother</div>
+  <div class="held" id="held" style="display:none"><span>👶</span><div class="hface" id="hface" style="display:none">😠</div></div>
+</div>
+<div class="ch" id="baby">
+  <div class="avatar" id="fig">👶</div>
+  <div class="tag">Baby</div>
+  <div class="face" id="face" style="display:none">😢</div>
+</div>
+<div class="ch" id="str" style="opacity:0">
+  <div class="avatar">👨</div>
+  <div class="tag">Stranger</div>
+  <div class="hug" id="hug" style="display:none">🤗</div>
+</div>
 </div>
 <div class="aud"><button id="audBtn">🔊 Narration: ON</button></div>
 <div class="ctl"><button class="p" id="playBtn">▶ Play</button><button class="s" id="resetBtn">Reset</button></div>
@@ -220,24 +241,33 @@ hugT=setTimeout(function(){h.style.display='none'},1000)}
 function gap(){var m=$('mom').getBoundingClientRect(),b=$('baby').getBoundingClientRect();
 return(m.left+m.width/2)-(b.left+b.width/2)}
 
+function setSceneStatus(msg, tone){
+var st=$('sceneStatus');
+if(!st)return;
+st.textContent=msg;
+st.className='scene-status'+(tone? ' '+tone : '');
+}
+
 function draw(x){
 var mom=$('mom'),baby=$('baby'),fig=$('fig'),hld=$('held'),
 hf=$('hface'),str=$('str'),fc=$('face');
 baby.style.transform='';GAP=gap();
 var mX=Math.max(-400,-400+(x/3)*400),bX=Math.max(-350,-350+(x/3)*350);
 var mO=1,sO=0,wob=0,held=false,sf=false,em='😢';
+var status='Settling in and observing';
+var tone='';
 if(x>=3){mX=0;bX=0;
-if(cur==='C1'&&x<19){bX=GAP*Math.min((x-3)/1.5,1);sf=true;em='😟'}
-else if(x<19){wob=Math.sin(x*.5)*30}}
-if(x>=11&&x<27)sO=.8;
+if(cur==='C1'&&x<19){bX=GAP*Math.min((x-3)/1.5,1);sf=true;em='😟';status='Baby clings to mother and looks worried';tone='';}
+else if(x<19){wob=Math.sin(x*.5)*30;status='Baby explores the room while checking on the caregiver';tone='';}}
+if(x>=11&&x<27){sO=.95;status='A stranger enters and the infant reacts to the new person';tone='';}
 if(x>=19&&x<27){mO=0;var sp=x-19;
-if(cur==='A1'){wob=Math.sin(x*.5)*30}
-else if(cur==='C1'){bX=GAP;sf=true;em='😢';if(sp%1.5<.06)showHug()}
-else{sf=true;em=sp<2?'😢':'🥺';if(sp%1.5<.06)showHug()}}
+if(cur==='A1'){wob=Math.sin(x*.5)*30;status='Mother leaves: the infant shows little distress and continues playing';tone='avoidant';}
+else if(cur==='C1'){bX=GAP;sf=true;em='😢';status='Mother leaves: the infant becomes intensely distressed and upset';tone='ambivalent';if(sp%1.5<.06)showHug()}
+else{sf=true;em=sp<2?'😢':'🥺';status='Mother leaves: the infant becomes confused and distressed';tone='disorganized';if(sp%1.5<.06)showHug()}}
 if(x>=27){mO=1;var r=x-27;
-if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑'}
-else{var p=Math.min(r/1.5,1);
-if(p<1){bX=GAP*p}else{held=true;bX=GAP}}}
+if(cur==='A1'){wob=Math.sin(x*.5)*30;sf=true;em='😑';status='Mother returns: the infant avoids contact and ignores her';tone='avoidant';}
+else if(cur==='C1'){var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};status='Mother returns: the infant seeks comfort but still resists contact';tone='ambivalent';}
+else{var p=Math.min(r/1.5,1);if(p<1){bX=GAP*p}else{held=true;bX=GAP};status='Mother returns: the infant shows confused, inconsistent behavior';tone='disorganized';}}
 fc.style.display=sf?'block':'none';if(sf)fc.textContent=em;
 if(sf&&em!=='😑'&&em!=='😟')baby.classList.add('shaking');
 else baby.classList.remove('shaking');
@@ -247,7 +277,13 @@ hf.style.display=(held&&cur==='C1')?'block':'none';
 if(held)hld.classList.add('lifting');else hld.classList.remove('lifting');
 mom.style.opacity=mO;mom.style.transform='translateX('+mX+'px)';
 baby.style.transform='translateX('+(bX+wob)+'px)';
-str.style.opacity=sO}
+str.style.opacity=sO;
+setSceneStatus(status,tone);
+if(cur==='D'&&x>=27&&Math.floor(x)%2===0){
+  baby.style.filter='drop-shadow(0 0 10px rgba(220,53,69,.35))';
+} else {
+  baby.style.filter='';
+}}
 
 function reset(){go=false;t=0;t0=null;lastN=null;
 if(syn)syn.cancel();if(raf)cancelAnimationFrame(raf);
